@@ -1,10 +1,17 @@
 package me.miskynet.moreArmorstandPoses.listener;
 
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import me.miskynet.moreArmorstandPoses.custom.ArmorstandConfigMenu;
 import me.miskynet.moreArmorstandPoses.custom.ComponentUtils;
 import me.miskynet.moreArmorstandPoses.custom.Pose;
+import me.miskynet.moreArmorstandPoses.utils.Config;
 import me.miskynet.moreArmorstandPoses.utils.PDCUtils;
 import me.miskynet.moreArmorstandPoses.utils.Utils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import org.apache.commons.lang3.StringUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -13,6 +20,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.HashMap;
@@ -33,8 +41,16 @@ public class InteractListener implements Listener {
 
         ArmorStand armorStand = (ArmorStand) event.getRightClicked();
 
+        Player player = event.getPlayer();
+
+        // check if the modify tool has to be used and
+        // if its the correct one
+        if (!checkForTool(player)) {
+            return;
+        }
+
         // check if the player is sneaking
-        if (!(event.getPlayer().isSneaking())) {
+        if (!(player.isSneaking())) {
             return;
         }
 
@@ -119,5 +135,49 @@ public class InteractListener implements Listener {
             Utils.createClickCooldown((Player) event.getWhoClicked());
             event.setCancelled(true);
         }
+    }
+
+    /**
+     * Check if a player has to use (and if yes, is using) the correct tool
+     * @param player The player that should be checked for
+     * @return True if the player is using the correct tool, false otherwise
+     * */
+    private boolean checkForTool(Player player) {
+
+        // return true when the force-mod-tool is disabled in the config.yml
+        if (!((boolean) Config.get("config.yml", "force-mod-tool"))) {
+            return true;
+        }
+
+        ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
+        Material materialInMainHand = itemInMainHand.getType();
+
+        // return false when the material does not match the material in the config
+        if (!(materialInMainHand.equals(Material.valueOf((String) Config.get("config.yml", "mod-tool.material"))))) {
+            return false;
+        }
+
+        // check if displayName is an Integer and is set to -1
+        if (Config.get("config.yml", "mod-tool.displayName") instanceof Integer &&
+                (Integer) Config.get("config.yml", "mod-tool.displayName") == -1) {
+            return true;
+        }
+
+        // check if the item is renamed
+        // when an item is not renamed, #displayName() will return null
+        if (itemInMainHand.getItemMeta().displayName() != null) {
+            // check if the displayName in the config is the same as the name on the item
+            if (Config.get("config.yml", "mod-tool.displayName")
+                    .equals(ComponentUtils.toString((TextComponent) itemInMainHand.getItemMeta().displayName()))) {
+                return true;
+            }
+        } else {
+            // check if the default item name quals the display name in the config
+            if (Utils.getCapitalizedString(itemInMainHand.getType().name()).equals(Config.get("config.yml", "mod-tool.displayName"))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

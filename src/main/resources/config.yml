@@ -1,0 +1,13 @@
+# The mod tool will be required to change the pose of the
+# armor stand, else you will be able to simply shift-right click
+# the armor stand to change its pose
+force-mod-tool: true
+
+# This option will only be considered by the plugin when the
+# 'force-mod-tool' is set to true
+# This will be the tool required to change the pose of the armor stand
+# When the displayName option is set to -1, the display name
+# is ignored when checking the tool
+mod-tool:
+  material: STICK
+  displayName: "armor stand mod tool"

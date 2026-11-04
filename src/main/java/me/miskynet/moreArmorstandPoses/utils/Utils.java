@@ -1,5 +1,6 @@
 package me.miskynet.moreArmorstandPoses.utils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.util.EulerAngle;
 
@@ -85,6 +86,28 @@ public class Utils {
      * */
     public static EulerAngle radEuler(Double x, Double y, Double z) {
         return new EulerAngle(Utils.degreeInRadiant(x), Utils.degreeInRadiant(y), Utils.degreeInRadiant(z));
+    }
+
+    /**
+     * Capitalizes each part of a string that is considered a new word
+     * @param string The String that will be capitalized
+     * @return The capitalized string
+     * */
+    // Coded by AI
+    public static String getCapitalizedString(String string) {
+
+        String[] parts = string.toLowerCase().split("_");
+        StringBuilder builder = new StringBuilder();
+
+        for (String part : parts) {
+            if (builder.length() > 0) {
+                builder.append(" ");
+            }
+            builder.append(StringUtils.capitalize(part));
+        }
+
+        String formattedName = builder.toString();
+        return formattedName;
     }
 
 }
