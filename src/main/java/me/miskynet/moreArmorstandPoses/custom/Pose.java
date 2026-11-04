@@ -1,12 +1,18 @@
 package me.miskynet.moreArmorstandPoses.custom;
 
+import me.miskynet.moreArmorstandPoses.utils.Config;
 import me.miskynet.moreArmorstandPoses.utils.PDCUtils;
 import me.miskynet.moreArmorstandPoses.utils.Utils;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.EulerAngle;
+import org.joml.Vector3d;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * A pose is used to change the rotation of the body parts of an {@link ArmorStand}
@@ -123,6 +129,8 @@ public class Pose {
                 Utils.radEuler(210d, 25d, 0d),
                 Utils.radEuler(0d, 0d, 0d),
                 Utils.radEuler(0d, 0d, 0d)));
+
+        loadPosesFromConfig();
     }
 
     /**
@@ -133,4 +141,60 @@ public class Pose {
             return (int) PDCUtils.getPDC(armorStand, PDCUtils.armorStandPoseID, PersistentDataType.INTEGER);
         else return null;
     }
+
+    /**
+     * Load all poses from the config
+     * */
+    public static void loadPosesFromConfig() {
+
+        Set<String> poses = Config.get("customPoses.yml").getConfigurationSection("").getKeys(false);
+
+        // loop through each section
+        for (String singlePose : poses) {
+            String name = (String) Config.get("customPoses.yml", singlePose + ".name");
+            EulerAngle head = getEulerAngles(singlePose, "head");
+            EulerAngle body = getEulerAngles(singlePose, "body");
+            EulerAngle armRight = getEulerAngles(singlePose, "armRight");
+            EulerAngle armLeft = getEulerAngles(singlePose, "armLeft");
+            EulerAngle legRight = getEulerAngles(singlePose, "legRight");
+            EulerAngle legLeft = getEulerAngles(singlePose, "legLeft");
+
+            Pose pose = new Pose(name, head, body, armRight, armLeft, legRight, legLeft);
+
+            poseList.add(pose);
+        }
+
+    }
+
+    /**
+     * Helper method for {@link #loadPosesFromConfig()}.
+     * Input a configKey and a section to get a {@link EulerAngle}
+     * (The targeted section HAS TO BE an integer list)
+     * @param configKey Key of the config section
+     * @param section Key of the config section key
+     * @return There values in an {@link EulerAngle}
+     * */
+    private static EulerAngle getEulerAngles(String configKey, String section) {
+        ArrayList<Integer> valueList = (ArrayList<Integer>) Config.get("customPoses.yml").getIntegerList(configKey + "." + section);
+
+        return Utils.radEuler(Double.parseDouble(valueList.get(0).toString()),
+                Double.parseDouble(valueList.get(1).toString()),
+                Double.parseDouble(valueList.get(2).toString()));
+    }
+
+
+//    // get each child element (name, head, body, ...)
+//            for (String element : elements) {
+//
+//        Bukkit.getLogger().info("current element: " + element);
+//
+//        if (!(element.equals("name"))) {
+//            List<Integer> values = (List<Integer>) Config.get("customPoses.yml").getList(singlePose + "." + element);;
+//
+//            EulerAngle angle = Utils.radEuler(Double.parseDouble(values.get(0).toString()),
+//                    Double.parseDouble(values.get(1).toString()),
+//                    Double.parseDouble(values.get(2).toString()));
+//        }
+//    }
+
 }

@@ -31,20 +31,32 @@ public class InteractListener implements Listener {
             return;
         }
 
+        ArmorStand armorStand = (ArmorStand) event.getRightClicked();
+
         // check if the player is sneaking
         if (!(event.getPlayer().isSneaking())) {
             return;
         }
 
         // cancel the opening when another player has already opened the menu
-        if (playerArmorStandRelationship.containsValue((ArmorStand) event.getRightClicked())) {
+        if (playerArmorStandRelationship.containsValue(armorStand)) {
             return;
         }
 
-        playerArmorStandRelationship.put(event.getPlayer(), (ArmorStand) event.getRightClicked());
+        // set the default position if the armor stand doesn't have a pose set currently
+        if (PDCUtils.getPDC(armorStand, PDCUtils.armorStandPoseID, PersistentDataType.INTEGER) == null) {
+            Pose.poseList.get(0).applyPose(armorStand);
+            PDCUtils.setPDC(armorStand, PDCUtils.armorStandPoseID, PersistentDataType.INTEGER, 0);
+        }
+
+        // put the player and the armor stand into a hashmap so no other play
+        // can open the GUI while another play has the GUI already open
+        playerArmorStandRelationship.put(event.getPlayer(), armorStand);
         // update the buttons in the GUI so the data of the armor stand is visible on the items in the gui
         armorstandConfigMenu.updateButtons(playerArmorStandRelationship.get(event.getPlayer()));
         armorstandConfigMenu.openForPlayer(event.getPlayer());
+
+        event.setCancelled(true);
     }
 
     @EventHandler
@@ -91,9 +103,6 @@ public class InteractListener implements Listener {
                         Pose.poseList.get(0).applyPose(currentArmorStand);
                         PDCUtils.setPDC(currentArmorStand, PDCUtils.armorStandPoseID, PersistentDataType.INTEGER, 0);
                     }
-                }else {
-                    Pose.poseList.get(0).applyPose(currentArmorStand);
-                    PDCUtils.setPDC(currentArmorStand, PDCUtils.armorStandPoseID, PersistentDataType.INTEGER, 0);
                 }
             }
 

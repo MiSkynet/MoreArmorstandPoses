@@ -1,0 +1,8 @@
+1:
+  name: "Example Pose"
+  head: [330, 0, 0]
+  body: [0, 0, 0]
+  armRight: [0, 0, 140]
+  armLeft: [210, 25, 0]
+  legRight: [0, 0, 0]
+  legLeft: [0, 0, 0]
