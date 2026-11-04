@@ -10,6 +10,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.EulerAngle;
 import org.joml.Vector3d;
 
+import java.lang.classfile.constantpool.PoolEntry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;

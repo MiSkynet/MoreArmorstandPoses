@@ -44,7 +44,7 @@ public class InteractListener implements Listener {
         Player player = event.getPlayer();
 
         // check if the modify tool has to be used and
-        // if its the correct one
+        // if it's the correct one
         if (!checkForTool(player)) {
             return;
         }
