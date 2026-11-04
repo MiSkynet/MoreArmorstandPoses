@@ -1,0 +1,6 @@
+name: MoreArmorstandPoses
+version: '${version}'
+
+main: me.miskynet.moreArmorstandPoses.Main
+api-version: '26.3'
+load: POSTWORLD
