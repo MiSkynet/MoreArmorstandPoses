@@ -55,16 +55,16 @@ public class InteractListener implements Listener {
             return;
         }
 
-        // set the default position if the armor stand doesn't have a pose set currently
-        if (PDCUtils.getPDC(armorStand, PDCUtils.poseID, PersistentDataType.INTEGER) == null) {
-            Pose.poseList.get(0).applyPose(armorStand);
-            PDCUtils.setPDC(armorStand, PDCUtils.poseID, PersistentDataType.INTEGER, 0);
-        }
-
         // save the original rotation of the armor stand onto it so the yaw can always be applied to this
         // original yaw
         if (PDCUtils.getPDC(armorStand, PDCUtils.originalRotation, PersistentDataType.FLOAT) == null) {
             PDCUtils.setPDC(armorStand, PDCUtils.originalRotation, PersistentDataType.FLOAT, armorStand.getYaw());
+        }
+
+        // set the default position if the armor stand doesn't have a pose set currently
+        if (PDCUtils.getPDC(armorStand, PDCUtils.poseID, PersistentDataType.INTEGER) == null) {
+            Pose.poseList.get(0).applyPose(armorStand);
+            PDCUtils.setPDC(armorStand, PDCUtils.poseID, PersistentDataType.INTEGER, 0);
         }
 
         // put the player and the armor stand into a hashmap so no other play
