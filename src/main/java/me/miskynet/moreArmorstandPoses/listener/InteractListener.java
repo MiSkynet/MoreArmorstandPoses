@@ -1,16 +1,12 @@
 package me.miskynet.moreArmorstandPoses.listener;
 
-import io.papermc.paper.datacomponent.DataComponentTypes;
 import me.miskynet.moreArmorstandPoses.custom.ArmorstandConfigMenu;
 import me.miskynet.moreArmorstandPoses.custom.ComponentUtils;
 import me.miskynet.moreArmorstandPoses.custom.Pose;
 import me.miskynet.moreArmorstandPoses.utils.Config;
 import me.miskynet.moreArmorstandPoses.utils.PDCUtils;
 import me.miskynet.moreArmorstandPoses.utils.Utils;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import org.apache.commons.lang3.StringUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
@@ -60,9 +56,15 @@ public class InteractListener implements Listener {
         }
 
         // set the default position if the armor stand doesn't have a pose set currently
-        if (PDCUtils.getPDC(armorStand, PDCUtils.armorStandPoseID, PersistentDataType.INTEGER) == null) {
+        if (PDCUtils.getPDC(armorStand, PDCUtils.poseID, PersistentDataType.INTEGER) == null) {
             Pose.poseList.get(0).applyPose(armorStand);
-            PDCUtils.setPDC(armorStand, PDCUtils.armorStandPoseID, PersistentDataType.INTEGER, 0);
+            PDCUtils.setPDC(armorStand, PDCUtils.poseID, PersistentDataType.INTEGER, 0);
+        }
+
+        // save the original rotation of the armor stand onto it so the yaw can always be applied to this
+        // original yaw
+        if (PDCUtils.getPDC(armorStand, PDCUtils.originalRotation, PersistentDataType.FLOAT) == null) {
+            PDCUtils.setPDC(armorStand, PDCUtils.originalRotation, PersistentDataType.FLOAT, armorStand.getYaw());
         }
 
         // put the player and the armor stand into a hashmap so no other play
@@ -110,14 +112,14 @@ public class InteractListener implements Listener {
 
             // toggle pose mechanic
             if (event.getSlot() == ArmorstandConfigMenu.togglePoseButtonSlot) {
-                if (PDCUtils.getPDC(currentArmorStand, PDCUtils.armorStandPoseID, PersistentDataType.INTEGER) != null) {
-                    int currentPoseID = (int) PDCUtils.getPDC(currentArmorStand, PDCUtils.armorStandPoseID, PersistentDataType.INTEGER);
+                if (PDCUtils.getPDC(currentArmorStand, PDCUtils.poseID, PersistentDataType.INTEGER) != null) {
+                    int currentPoseID = (int) PDCUtils.getPDC(currentArmorStand, PDCUtils.poseID, PersistentDataType.INTEGER);
                     if (currentPoseID < (Pose.poseList.size() - 1)) {
                         Pose.poseList.get(currentPoseID + 1).applyPose(currentArmorStand);
-                        PDCUtils.setPDC(currentArmorStand, PDCUtils.armorStandPoseID, PersistentDataType.INTEGER, currentPoseID + 1);
+                        PDCUtils.setPDC(currentArmorStand, PDCUtils.poseID, PersistentDataType.INTEGER, currentPoseID + 1);
                     }else {
                         Pose.poseList.get(0).applyPose(currentArmorStand);
-                        PDCUtils.setPDC(currentArmorStand, PDCUtils.armorStandPoseID, PersistentDataType.INTEGER, 0);
+                        PDCUtils.setPDC(currentArmorStand, PDCUtils.poseID, PersistentDataType.INTEGER, 0);
                     }
                 }
             }

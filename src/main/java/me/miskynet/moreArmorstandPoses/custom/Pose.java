@@ -3,16 +3,11 @@ package me.miskynet.moreArmorstandPoses.custom;
 import me.miskynet.moreArmorstandPoses.utils.Config;
 import me.miskynet.moreArmorstandPoses.utils.PDCUtils;
 import me.miskynet.moreArmorstandPoses.utils.Utils;
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.EulerAngle;
-import org.joml.Vector3d;
 
-import java.lang.classfile.constantpool.PoolEntry;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -25,6 +20,7 @@ public class Pose {
 
     private final EulerAngle head, body, armRight, armLeft, legRight, legLeft;
     private final String name;
+    private final Float rotation;
 
     /**
      * Constructor for {@link Pose}
@@ -36,8 +32,9 @@ public class Pose {
      * @param legRight {@link EulerAngle} of the right leg
      * @param legLeft {@link EulerAngle} of the left leg
      * */
-    public Pose(String name, EulerAngle head, EulerAngle body, EulerAngle armRight, EulerAngle armLeft, EulerAngle legRight, EulerAngle legLeft) {
+    public Pose(String name, Float rotation, EulerAngle head, EulerAngle body, EulerAngle armRight, EulerAngle armLeft, EulerAngle legRight, EulerAngle legLeft) {
         this.name = name;
+        this.rotation = rotation;
         this.head = head;
         this.body = body;
         this.armRight = armRight;
@@ -51,6 +48,7 @@ public class Pose {
      * @param armorStand The {@link ArmorStand} the {@link Pose} should be applied on
      * */
     public void applyPose(ArmorStand armorStand) {
+        armorStand.setRotation((float) PDCUtils.getPDC(armorStand, PDCUtils.originalRotation, PersistentDataType.FLOAT) + this.rotation, 0);
         armorStand.setHeadPose(this.head);
         armorStand.setBodyPose(this.body);
         armorStand.setRightArmPose(this.armRight);
@@ -84,6 +82,7 @@ public class Pose {
         // default pose
         Pose.poseList.add(new Pose(
                 "Default",
+                0.0f,
                 Utils.radEuler(0d, 0d, 0d),
                 Utils.radEuler(0d, 0d, 0d),
                 Utils.radEuler(0d, 0d, 0d),
@@ -94,6 +93,7 @@ public class Pose {
         // t pose
         Pose.poseList.add(new Pose(
                 "T-Pose",
+                0.0f,
                 Utils.radEuler(0d, 0d, 0d),
                 Utils.radEuler(0d, 0d, 0d),
                 Utils.radEuler(0d, 0d, 90d),
@@ -104,6 +104,7 @@ public class Pose {
         // walking
         Pose.poseList.add(new Pose(
                 "Walking",
+                0.0f,
                 Utils.radEuler(0d, 0d, 0d),
                 Utils.radEuler(0d, 0d, 0d),
                 Utils.radEuler(330d, 0d, 0d),
@@ -114,6 +115,7 @@ public class Pose {
         // expert
         Pose.poseList.add(new Pose(
                 "Expert",
+                0.0f,
                 Utils.radEuler(20d, 30d, 0d),
                 Utils.radEuler(0d, 0d, 0d),
                 Utils.radEuler(300d, 340d, 70d),
@@ -124,6 +126,7 @@ public class Pose {
         // salute
         Pose.poseList.add(new Pose(
                 "Salute",
+                0.0f,
                 Utils.radEuler(355d, 0d, 0d),
                 Utils.radEuler(0d, 0d, 0d),
                 Utils.radEuler(0d, 0d, 355d),
@@ -138,8 +141,8 @@ public class Pose {
      * @return ID of the current pose, null if no pose was found
      * */
     public static Integer getCurrentPoseID(ArmorStand armorStand) {
-        if (PDCUtils.getPDC(armorStand, PDCUtils.armorStandPoseID, PersistentDataType.INTEGER) != null)
-            return (int) PDCUtils.getPDC(armorStand, PDCUtils.armorStandPoseID, PersistentDataType.INTEGER);
+        if (PDCUtils.getPDC(armorStand, PDCUtils.poseID, PersistentDataType.INTEGER) != null)
+            return (int) PDCUtils.getPDC(armorStand, PDCUtils.poseID, PersistentDataType.INTEGER);
         else return null;
     }
 
@@ -150,9 +153,10 @@ public class Pose {
 
         Set<String> poses = Config.get("customPoses.yml").getConfigurationSection("").getKeys(false);
 
-        // loop through each section
+        // loop through each section (each pose)
         for (String singlePose : poses) {
             String name = (String) Config.get("customPoses.yml", singlePose + ".name");
+            Float rotation = Float.parseFloat(Config.get("customPoses.yml", singlePose + ".rotation").toString());
             EulerAngle head = getEulerAngles(singlePose, "head");
             EulerAngle body = getEulerAngles(singlePose, "body");
             EulerAngle armRight = getEulerAngles(singlePose, "armRight");
@@ -160,11 +164,10 @@ public class Pose {
             EulerAngle legRight = getEulerAngles(singlePose, "legRight");
             EulerAngle legLeft = getEulerAngles(singlePose, "legLeft");
 
-            Pose pose = new Pose(name, head, body, armRight, armLeft, legRight, legLeft);
+            Pose pose = new Pose(name, rotation, head, body, armRight, armLeft, legRight, legLeft);
 
             poseList.add(pose);
         }
-
     }
 
     /**

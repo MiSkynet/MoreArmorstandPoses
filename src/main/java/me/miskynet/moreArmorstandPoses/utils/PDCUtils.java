@@ -9,7 +9,8 @@ import org.bukkit.persistence.PersistentDataType;
 
 public class PDCUtils {
 
-    public final static NamespacedKey armorStandPoseID = new NamespacedKey(Main.getInstance(), "armorStandPoseID");
+    public final static NamespacedKey poseID = new NamespacedKey(Main.getInstance(), "poseID");
+    public final static NamespacedKey originalRotation = new NamespacedKey(Main.getInstance(), "originalRotation");
 
     /**
      * Gets the value of a {@link PersistentDataType} from an {@link Entity} or {@link ItemStack}
